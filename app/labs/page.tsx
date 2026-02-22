@@ -10,7 +10,8 @@ export default function labs() {
        </li>
        <li>
          <Link href="/labs/lab2" id="wd-lab2-link">
-           Lab 2: CSS Basics </Link>
+           Lab 2: CSS Basics 
+           Kimberley Liu </Link>
        </li>
        <li>
          <Link href="/labs/lab3" id="wd-lab3-link">

@@ -1,91 +1,42 @@
-import Link from "next/link";
+"use client"
 import { AiOutlineDashboard } from "react-icons/ai";
 import { IoCalendarOutline } from "react-icons/io5";
 import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
 import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { ListGroup, ListGroupItem } from "react-bootstrap";
-import { FaHome } from "react-icons/fa";
-import { MdViewModule, MdAssignment, MdOutlineQuiz, MdGrade, MdPeople } from "react-icons/md";
-import { BiLogoZoom } from "react-icons/bi";
-
-
-
-
-
-export default function CourseNavigation() {
+export default function KambazNavigation() {
+  const pathname = usePathname();
+  const links = [
+    { label: "Dashboard", path: "/dashboard", icon: AiOutlineDashboard },
+    { label: "Courses",   path: "/dashboard", icon: LiaBookSolid },
+    { label: "Calendar",  path: "/Calendar",  icon: IoCalendarOutline },
+    { label: "Inbox",     path: "/Inbox",     icon: FaInbox },
+    { label: "Labs",      path: "/labs",      icon: LiaCogSolid },
+  ];
   return (
-    <ListGroup className="rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2" style={{ width: 120 }}
-              id="wd-kambaz-navigation">
-     <ListGroupItem className="bg-black border-0 text-center" as="a"
-              target="_blank" href="https://www.northeastern.edu/" id="wd-neu-link">
-       <img src="/NEU.png" width="75px" alt="Northeastern University" />
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/account" id="wd-account-link" className="text-white text-decoration-none">
-         <FaRegCircleUser className="fs-1 text-white" />
-         <br />
-         Account
-       </Link>
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/dashboard" id="wd-dashboard-link" className="text-danger text-decoration-none">
-         <AiOutlineDashboard className="fs-1 text-danger" />
-         <br />
-         Dashboard
-       </Link>
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/courses/1234/home" id="wd-home-link" className="text-danger text-decoration-none">
-         <FaHome className="fs-1 text-danger" />
-         <br />
-         Home
-       </Link>
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/courses/1234/modules" id="wd-modules-link" className="text-danger text-decoration-none">
-         <MdViewModule className="fs-1 text-danger" />
-         <br />
-         Modules
-       </Link>
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/courses/1234/zoom" id="wd-zoom-link" className="text-danger text-decoration-none">
-         <BiLogoZoom className="fs-1 text-danger" />
-         <br />
-         Zoom
-       </Link>
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/courses/1234/assignments" id="wd-assignments-link" className="text-danger text-decoration-none">
-         <MdAssignment className="fs-1 text-danger" />
-         <br />
-         Assignments
-       </Link>
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/courses/1234/quizzes" id="wd-quizzes-link" className="text-danger text-decoration-none">
-         <MdOutlineQuiz className="fs-1 text-danger" />
-         <br />
-         Quizzes
-       </Link>
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/courses/1234/grades" id="wd-grades-link" className="text-danger text-decoration-none">
-         <MdGrade className="fs-1 text-danger" />
-         <br />
-         Grades
-       </Link>
-     </ListGroupItem>
-     <ListGroupItem className="border-0 bg-black text-center">
-       <Link href="/courses/1234/people/table" id="wd-people-link" className="text-danger text-decoration-none">
-         <MdPeople className="fs-1 text-danger" />
-         <br />
-         People
-       </Link>
-     </ListGroupItem>
-     </ListGroup>
-
-    
-  );}
-
-
+    <ListGroup id="wd-kambaz-navigation" style={{width: 120}}
+         className="rounded-0 position-fixed bottom-0 top-0 d-none d-md-block bg-black z-2">
+      <ListGroupItem id="wd-neu-link" target="_blank" href="https://www.northeastern.edu/"
+        action className="bg-black border-0 text-center">
+        <img src="NEU.png" width="75px" /></ListGroupItem>
+      <ListGroupItem as={Link} href="/account"
+        className={`text-center border-0 bg-black
+            ${pathname.includes("Account") ? "bg-white text-danger" : "bg-black text-white"}`}>
+        <FaRegCircleUser
+          className={`fs-1 ${pathname.includes("Account") ? "text-danger" : "text-white"}`} />
+        <br />
+        Account
+      </ListGroupItem>
+      {links.map((link) => (
+        <ListGroupItem key={link.path} as={Link} href={link.path}
+          className={`bg-black text-center border-0
+            ${pathname.includes(link.label) ? "text-danger bg-white":"text-white bg-black"}`}>
+          {link.icon({ className: "fs-1 text-danger"})}
+          <br />
+          {link.label}
+        </ListGroupItem>
+      ))}
+    </ListGroup>
+);}

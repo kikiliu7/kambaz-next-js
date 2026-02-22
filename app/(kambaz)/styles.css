@@ -33,3 +33,6 @@ body * {
 .wd-lesson {
   border-left: 3px solid green !important;
 }
+.wd-assignment {
+  border-left: 5px solid green !important;
+}
