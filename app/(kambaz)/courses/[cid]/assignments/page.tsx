@@ -1,66 +1,46 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// app/courses/[cid]/assignments/page.tsx
 "use client";
-import { useParams } from "next/navigation";
-import * as db from "../../../database";
-import { ListGroup, ListGroupItem } from "react-bootstrap";
-import { BsGripVertical, BsCaretDownFill } from "react-icons/bs";
-import { MdAssignment } from "react-icons/md";
-import { FaCheckCircle } from "react-icons/fa";
-import { IoEllipsisVertical } from "react-icons/io5";
+import { RootState } from "../../../store";
 import Link from "next/link";
+import { useParams } from "next/navigation";
+import { FaTrash } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteAssignment } from "./reducer";
 
 export default function Assignments() {
   const { cid } = useParams();
-  const assignments = db.assignments.filter((a: any) => a.course === cid);
+  const dispatch = useDispatch();
+  const { assignments } = useSelector((state: RootState) => state.assignmentsReducer);
+  const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+  const isFaculty = currentUser.role === "FACULTY";
+
+  const handleDelete = (aid: string) => {
+    if (window.confirm("Are you sure you want to remove this assignment?")) {
+      dispatch(deleteAssignment(aid));
+    }
+  };
 
   return (
-    <div className="p-4">
-      <div className="d-flex justify-content-between mb-4">
-        <input className="form-control w-50" placeholder="Search..."/>
-        <div>
-          <button className="btn btn-secondary me-1">+ Group</button>
-          <button className="btn btn-danger">+ Assignment</button>
-        </div>
-      </div>
-
-      <ListGroup className="rounded-0 shadow-sm">
-        <ListGroupItem className="bg-light p-3 border-bottom-0 d-flex justify-content-between align-items-center">
-          <div className="fw-bold">
-            <BsGripVertical className="me-2 fs-3" />
-            <BsCaretDownFill className="me-2" />
-            ASSIGNMENTS
+    <div id="wd-assignments">
+      {isFaculty && (
+        <Link href={`/Kambaz/Courses/${cid}/Assignments/new`} className="btn btn-danger float-end">
+          + Assignment
+        </Link>
+      )}
+      {/* ... filter assignments by course ID and map ... */}
+      {assignments
+        .filter((a) => a.course === cid)
+        .map((a) => (
+          <div key={a._id} className="d-flex align-items-center border-start border-success border-4 mb-2 p-3">
+             <Link href={`/Kambaz/Courses/${cid}/Assignments/${a._id}`} className="flex-grow-1 text-dark text-decoration-none">
+                <b>{a.title}</b>
+             </Link>
+             {isFaculty && (
+               <button onClick={() => handleDelete(a._id)} className="btn text-danger">
+                 <FaTrash />
+               </button>
+             )}
           </div>
-          <div className="d-flex align-items-center">
-            <span className="border rounded-pill px-3 py-1 text-muted me-3">40% of Total</span>
-            <span className="fs-4 me-3">+</span>
-            <IoEllipsisVertical className="fs-5" />
-          </div>
-        </ListGroupItem>
-
-        {assignments.map((a: any) => (
-          <ListGroupItem key={a._id} className="d-flex align-items-center p-3 border-start border-success wd-assignment">
-            <BsGripVertical className="me-2 fs-3 text-muted" />
-            <MdAssignment className="me-3 fs-3 text-success" />
-            
-            <div className="flex-grow-1">
-              <Link href={`/courses/${cid}/assignments/${a._id}`} className="text-dark fw-bold text-decoration-none fs-5">
-                {a.title}
-              </Link>
-              <div className="text-muted small">
-                <span className="text-danger">Multiple Modules</span> | <b>Not available until</b> {a.available} |
-                <br />
-                <b>Due</b> {a.due} | {a.pts} pts
-              </div>
-            </div>
-
-            <div className="d-flex align-items-center">
-              <FaCheckCircle className="text-success me-3 fs-5" />
-              <IoEllipsisVertical className="fs-5 text-muted" />
-            </div>
-          </ListGroupItem>
         ))}
-      </ListGroup>
     </div>
   );
 }

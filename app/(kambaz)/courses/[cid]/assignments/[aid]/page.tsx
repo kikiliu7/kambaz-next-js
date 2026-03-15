@@ -1,100 +1,69 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React from "react";
-import Link from "next/link";
+import { RootState } from "../../../../store";
 import { useParams } from "next/navigation";
-import * as db from "../../../../database";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addAssignment, updateAssignment } from "../reducer";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
+  const router = useRouter();
+  const dispatch = useDispatch();
+  
+  
+  const { assignments } = useSelector((state: RootState) => state.assignmentReducer);
+  const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+  const isFaculty = currentUser.role === "FACULTY";
 
-  const assignment = db.assignments.find((a: any) => a._id === aid);
+  
+  const existing = assignments.find((a) => a._id === aid);
+  
+  const [assignment, setAssignment] = useState(existing || {
+    title: "New Assignment",
+    description: "Description",
+    pts: 100,
+    due: "2024-05-13",
+    availableFrom: "2024-05-06",
+    availableUntil: "2024-05-20",
+    course: cid
+  });
+
+  const handleSave = () => {
+    if (aid === "new") {
+      dispatch(addAssignment({ ...assignment, _id: new Date().getTime().toString() }));
+    } else {
+      dispatch(updateAssignment(assignment));
+    }
+    router.push(`/Kambaz/Courses/${cid}/Assignments`);
+  };
 
   return (
-    <div id="wd-assignments-editor" className="p-4">
-      <div className="mb-3">
-        <label htmlFor="wd-name" className="form-label">Assignment Name</label>
-        <input 
-          id="wd-name" 
-          className="form-control" 
-          defaultValue={assignment?.title} 
-        />
-      </div>
-
-      <div className="mb-3">
-        <textarea 
-          id="wd-description" 
-          className="form-control" 
-          rows={10}
-          defaultValue="The assignment is available online. Submit a link to the landing page of your Web application hosted on Netlify. The landing page should include the following: Your name and ASURITE, a link to your GitHub repository, a link to the Kanban application..."
-        />
-      </div>
-
-      <div className="row mb-3">
-        <div className="col-md-3 text-end">
-          <label htmlFor="wd-points" className="col-form-label">Points</label>
-        </div>
-        <div className="col-md-9">
-          <input 
-            id="wd-points" 
-            className="form-control" 
-            defaultValue={assignment?.pts} 
-          />
-        </div>
-      </div>
-
-      <div className="row mb-3">
-        <div className="col-md-3 text-end">
-          <label className="col-form-label">Assign</label>
-        </div>
-        <div className="col-md-9 border p-3 rounded">
-          <div className="mb-3">
-            <label htmlFor="wd-due-date" className="form-label fw-bold">Due</label>
-            <input 
-              type="date" 
-              id="wd-due-date" 
-              className="form-control" 
-              defaultValue="2024-05-13" 
-            />
-          </div>
-
-          <div className="row">
-            <div className="col-6">
-              <label htmlFor="wd-available-from" className="form-label fw-bold">Available from</label>
-              <input 
-                type="date" 
-                id="wd-available-from" 
-                className="form-control" 
-                defaultValue="2024-05-06" 
-              />
-            </div>
-            <div className="col-6">
-              <label htmlFor="wd-available-until" className="form-label fw-bold">Until</label>
-              <input 
-                type="date" 
-                id="wd-available-until" 
-                className="form-control" 
-                defaultValue="2024-05-20" 
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div className="p-4">
+      <input 
+        className="form-control mb-3"
+        value={assignment.title} 
+        readOnly={!isFaculty}
+        onChange={(e) => setAssignment({...assignment, title: e.target.value})}
+      />
+      <textarea 
+        className="form-control mb-3"
+        value={assignment.course}
+        readOnly={!isFaculty}
+        onChange={(e) => setAssignment({...assignment, course: e.target.value})}
+      />
+      {/* Add similar inputs for pts, due, availableFrom, and availableUntil */}
+      
       <hr />
-      <div className="d-flex justify-content-end">
-        <Link 
-          href={`/Kambaz/Courses/${cid}/Assignments`} 
-          className="btn btn-secondary me-2"
-        >
+      <div className="float-end">
+        <button onClick={() => router.push(`/Kambaz/Courses/${cid}/Assignments`)} className="btn btn-secondary me-2">
           Cancel
-        </Link>
-        <Link 
-          href={`/Kambaz/Courses/${cid}/Assignments`} 
-          className="btn btn-danger"
-        >
-          Save
-        </Link>
+        </button>
+        {isFaculty && (
+          <button onClick={handleSave} className="btn btn-danger">
+            Save
+          </button>
+        )}
       </div>
     </div>
   );
