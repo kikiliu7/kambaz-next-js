@@ -13,7 +13,7 @@ export default function Assignments() {
   const { cid } = useParams();
   const dispatch = useDispatch();
 
-  const { assignments } = useSelector((state: RootState) => state.assignmentReducer || { assignments: [] });
+  const assignments = useSelector((state: RootState) => state.assignmentReducer?.assignments) || [];
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
   const isFaculty = currentUser?.role === "FACULTY";
 
@@ -55,7 +55,7 @@ export default function Assignments() {
           <ul className="list-group rounded-0 border-top-0">
             {filteredAssignments.length > 0 ? (
               filteredAssignments.map((a: any) => (
-                <li key={a._id} className="list-group-item p-3 d-flex align-items-center border-start border-success border-4">
+                <li key={a._id} className="list-group-item p-3 d-flex align-items-center border-start border-success border-2">
                   <BsGripVertical className="me-2 fs-3 text-muted" />
                   <FaRegEdit className="text-success me-3 fs-4" />
                   

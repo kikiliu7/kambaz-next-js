@@ -11,7 +11,7 @@ export default function AssignmentEditor() {
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const { assignments } = useSelector((state: RootState) => state.assignmentReducer || { assignments: []});
+  const assignments = useSelector((state: RootState) => state.assignmentReducer?.assignments) || [];
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
   
   const isFaculty = currentUser?.role === "FACULTY";
