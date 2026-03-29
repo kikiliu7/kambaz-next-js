@@ -12,17 +12,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { addNewCourse, deleteCourse, updateCourse, setCourses } from "../courses/reducer";
 import { RootState } from "../store";
 import { Button, Card, CardBody, CardImg, CardText, CardTitle, Col, Row } from "react-bootstrap";
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
 import { RootState } from "../store";
 
 export default function Dashboard() {
   const { courses } = useSelector((state: RootState) => state.coursesReducer);
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
+  const { enrollments } = db;
   const [course, setCourse] = useState({
     name: "New Course",
     description: "New Description",
   });
-  const { enrollments } = db;
   const dispatch = useDispatch();
 
  return (
@@ -45,10 +44,10 @@ export default function Dashboard() {
    <div id="wd-dashboard-courses">
     <Row xs={1} md={5} className="g-4">
      {courses
-     .filter((course) =>
-      enrollments.some(
+         .filter((course) =>
+      currentUser && enrollments.some(
         (enrollment) =>
-          enrollment.user === currentUser?._id &&
+          enrollment.user === currentUser._id && 
           enrollment.course === course._id
          ))
 .map((course) => (

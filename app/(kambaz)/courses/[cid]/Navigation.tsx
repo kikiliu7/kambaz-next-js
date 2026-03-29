@@ -1,17 +1,15 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Breadcrumb from "./BreadCrumb";
-import { courses } from "../../database";
+import * as db from "../../database";
 
-interface CourseNavigationProps {
-  cid: string;
-}
+export default function CourseNavigation() {
 
-export default function CourseNavigation({ cid }: CourseNavigationProps) {
   const pathname = usePathname();
+  const { cid } = useParams();
   const links = ["Home", "Modules", "Piazza", "Zoom", "Assignments", "Quizzes", "Grades", "People"];
-  const course = courses.find((c) => c._id === cid);
+  const course = db.courses.find((c) => c._id === cid);
 
   return (
     <div id="wd-courses-navigation" className="list-group fs-5 rounded-0">

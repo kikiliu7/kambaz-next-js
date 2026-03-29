@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/set-state-in-effect */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -6,7 +8,6 @@ import { setCurrentUser } from "../reducer";
 import { RootState } from "../../store";
 import { Button, FormControl } from "react-bootstrap";
 export default function Profile() {
- // eslint-disable-next-line @typescript-eslint/no-explicit-any
  const [profile, setProfile] = useState<any>({});
  const dispatch = useDispatch();
  const { currentUser } = useSelector((state: RootState) => state.accountReducer);
@@ -19,9 +20,8 @@ export default function Profile() {
    redirect("/account/signin");
  };
  useEffect(() => {
-   // eslint-disable-next-line react-hooks/set-state-in-effect
    fetchProfile();
- }, [fetchProfile]);
+ }, []);
  return (
    <div className="wd-profile-screen">
      <h3>Profile</h3>
