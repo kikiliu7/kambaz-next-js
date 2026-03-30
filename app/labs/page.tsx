@@ -22,12 +22,18 @@ export default function labs() {
            Lab 4: Maintaining States in React Applications </Link>
        </li>
        <li>
+         <Link href="/labs/lab5" id="wd-lab5-link">
+           Lab 5 </Link>
+       </li>
+       <li>
         <Link href="./lab4/react-context">React Context Examples</Link>
         </li>
         <li>
              <Link href="./lab4/zustand">Zustand Examples</Link>
         </li>
        <li>
+
+
        <Link href="/" id="wd-kambaz-link">
          Kambaz </Link> </li>
      </ul>
