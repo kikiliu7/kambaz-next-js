@@ -10,10 +10,21 @@ export default function AccountNavigation() {
  const pathname = usePathname();
  return (
    <Nav variant="pills">
-     {links.map((link) => (
-       <NavItem key={link}>
-         <NavLink as={Link} href={link} active={pathname.endsWith(link)}>
-           {link} </NavLink> </NavItem>
-     ))}
+
+{links.map((link) => (
+  <NavItem key={link}>
+    <NavLink 
+      as={Link} 
+      href={`/account/${link}`}
+      active={pathname.endsWith(link)}
+    >
+      {link}
+    </NavLink> 
+  </NavItem>
+))}
+     {currentUser && currentUser.role === "ADMIN" && (
+      <NavItem>
+       <NavLink as={Link} href={`/account/users`}  active={pathname.endsWith('users')}> Users </NavLink>    </NavItem>
+       )}
    </Nav>
 );}

@@ -53,7 +53,7 @@ const updateProfile = async () => {
          <FormControl id="wd-email" className="mb-2"
            defaultValue={profile.email}
            onChange={(e) => setProfile({ ...profile, email: e.target.value })} />
-         <select className="form-control mb-2" id="wd-role" 
+         <select className="form-control mb-2" id="wd-role" value={profile.role}
            onChange={(e) => setProfile({ ...profile, role: e.target.value })} >
            <option value="USER">User</option>
            <option value="ADMIN">Admin</option>
