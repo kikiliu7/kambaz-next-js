@@ -1,48 +1,58 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
-import { addNewAssignment, updateAssignment } from "../reducer";
+import * as client from "../client";
 
 export default function AssignmentEditor() {
   const { cid, aid } = useParams();
   const router = useRouter();
-  const dispatch = useDispatch();
-
-  const assignments = useSelector((state: RootState) => state.assignmentReducer?.assignments) || [];
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
-  
   const isFaculty = currentUser?.role === "FACULTY";
-  const existing = assignments.find((a: any) => a._id === aid);
 
-  const [assignment, setAssignment] = useState<any>(existing || {
+  const [assignment, setAssignment] = useState<any>({
     title: "New Assignment",
     course: cid,
-    pts: "100",
-    due: "",
-    available: ""
+    points: 100,
+    dueDate: "",
+    availableFrom: "",
+    availableUntil: "",
   });
 
-  const handleSave = () => {
-    if (existing) {
-      dispatch(updateAssignment(assignment));
-    } else {
-      dispatch(addNewAssignment({ ...assignment, _id: new Date().getTime().toString() }));
+  const fetchAssignment = async () => {
+    if (aid && aid !== "new") {
+      const data = await client.findAssignmentsForCourse(cid as string);
+      const existing = data.find((a: any) => a._id === aid);
+      if (existing) setAssignment(existing);
     }
-    router.push(`/Kambaz/Courses/${cid}/Assignments`);
+  };
+
+  useEffect(() => {
+    fetchAssignment();
+  }, [aid]);
+
+  const handleSave = async () => {
+    if (aid && aid !== "new") {
+      await client.updateAssignment(assignment);
+    } else {
+      await client.createAssignment(cid as string, assignment);
+    }
+    router.push(`/courses/${cid}/assignments`);
   };
 
   return (
     <div id="wd-assignments-editor" className="p-4">
       <div className="mb-3">
         <label className="form-label">Assignment Name</label>
-        <input 
-          className="form-control" 
+        <input
+          className="form-control"
           value={assignment.title}
           readOnly={!isFaculty}
-          onChange={(e) => setAssignment({ ...assignment, title: e.target.value })} 
+          onChange={(e) => setAssignment({ ...assignment, title: e.target.value })}
         />
       </div>
 
@@ -51,11 +61,11 @@ export default function AssignmentEditor() {
           <label className="col-form-label">Points</label>
         </div>
         <div className="col-md-9">
-          <input 
-            className="form-control" 
-            value={assignment.pts || ""} 
+          <input
+            className="form-control"
+            value={assignment.points || ""}
             readOnly={!isFaculty}
-            onChange={(e) => setAssignment({ ...assignment, pts: e.target.value })}
+            onChange={(e) => setAssignment({ ...assignment, points: e.target.value })}
           />
         </div>
       </div>
@@ -67,22 +77,32 @@ export default function AssignmentEditor() {
         <div className="col-md-9 border p-3 rounded">
           <div className="mb-3">
             <label className="form-label fw-bold">Due</label>
-            <input 
-              className="form-control" 
-              placeholder="e.g. May 13 at 11:59pm"
-              value={assignment.due || ""} 
+            <input
+              className="form-control"
+              type="date"
+              value={assignment.dueDate || ""}
               readOnly={!isFaculty}
-              onChange={(e) => setAssignment({ ...assignment, due: e.target.value })}
+              onChange={(e) => setAssignment({ ...assignment, dueDate: e.target.value })}
             />
           </div>
           <div className="mb-3">
-            <label className="form-label fw-bold">Available</label>
-            <input 
-              className="form-control" 
-              placeholder="e.g. May 6 at 12:00am"
-              value={assignment.available || ""} 
+            <label className="form-label fw-bold">Available From</label>
+            <input
+              className="form-control"
+              type="date"
+              value={assignment.availableFrom || ""}
               readOnly={!isFaculty}
-              onChange={(e) => setAssignment({ ...assignment, available: e.target.value })}
+              onChange={(e) => setAssignment({ ...assignment, availableFrom: e.target.value })}
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Available Until</label>
+            <input
+              className="form-control"
+              type="date"
+              value={assignment.availableUntil || ""}
+              readOnly={!isFaculty}
+              onChange={(e) => setAssignment({ ...assignment, availableUntil: e.target.value })}
             />
           </div>
         </div>
@@ -90,8 +110,8 @@ export default function AssignmentEditor() {
 
       <hr />
       <div className="d-flex justify-content-end">
-        <button 
-          onClick={() => router.push(`/Kambaz/Courses/${cid}/Assignments`)} 
+        <button
+          onClick={() => router.push(`/courses/${cid}/assignments`)}
           className="btn btn-secondary me-2"
         >
           Cancel

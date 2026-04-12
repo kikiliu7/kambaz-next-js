@@ -14,7 +14,7 @@ import LessonControlButtons from "./LessonControlButtons";
 import ModuleControlButtons from "./moduleControlButtons";
 
 export default function Modules() {
-  const { cid } = useParams();
+ const cid = useParams().cid as string;
   const dispatch = useDispatch();
   const [moduleName, setModuleName] = useState("");
   const { modules } = useSelector((state: RootState) => state.modulesReducer);
@@ -37,10 +37,11 @@ export default function Modules() {
     setModuleName("");
   };
 
-  const onRemoveModule = async (moduleId: string) => {
-    await client.deleteModule(moduleId);
-    dispatch(deleteModule(moduleId)); 
-  };
+ const onRemoveModule = async (moduleId: string) => {
+   await client.deleteModule(cid, moduleId);
+   dispatch(setModules(modules.filter((m: any) => m._id !== moduleId)));
+ };
+
 
   const onSaveModuleUpdate = async (module: any) => {
     await client.updateModule(module);

@@ -1,25 +1,36 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { BsGripVertical, BsSearch, BsPlus } from "react-icons/bs";
 import { FaCheckCircle, FaEllipsisV, FaRegEdit } from "react-icons/fa";
 import { RootState } from "../../../store";
-import { deleteAssignment } from "./reducer";
+import * as client from "./client";
 
 export default function Assignments() {
   const { cid } = useParams();
-  const dispatch = useDispatch();
-
-  const assignments = useSelector((state: RootState) => state.assignmentReducer?.assignments) || [];
   const { currentUser } = useSelector((state: RootState) => state.accountReducer);
   const isFaculty = currentUser?.role === "FACULTY";
+  const [assignments, setAssignments] = useState<any[]>([]);
 
-  const filteredAssignments = assignments.filter((a: any) => 
-    a.course === cid as string
-  );
+  const fetchAssignments = async () => {
+    const data = await client.findAssignmentsForCourse(cid as string);
+    setAssignments(data);
+  };
+
+  const handleDelete = async (assignmentId: string) => {
+    if (window.confirm("Delete?")) {
+      await client.deleteAssignment(assignmentId);
+      setAssignments(assignments.filter((a) => a._id !== assignmentId));
+    }
+  };
+
+  useEffect(() => {
+    fetchAssignments();
+  }, [cid]);
 
   return (
     <div id="wd-assignments" className="p-4">
@@ -53,31 +64,28 @@ export default function Assignments() {
           </div>
 
           <ul className="list-group rounded-0 border-top-0">
-            {filteredAssignments.length > 0 ? (
-              filteredAssignments.map((a: any) => (
+            {assignments.length > 0 ? (
+              assignments.map((a: any) => (
                 <li key={a._id} className="list-group-item p-3 d-flex align-items-center border-start border-success border-2">
                   <BsGripVertical className="me-2 fs-3 text-muted" />
                   <FaRegEdit className="text-success me-3 fs-4" />
-                  
                   <div className="flex-grow-1">
-                    <Link href={`/courses/${cid}/assignments/${a._id}`} className="fw-bold text-dark text-decoration-none fs-5">
+                    <Link href={`/courses/${cid}/assignments/${a._id}`}
+                      className="fw-bold text-dark text-decoration-none fs-5">
                       {a.title}
                     </Link>
                     <div className="small">
-                      <span className="text-danger">Multiple Modules</span> | 
-                      <b> Not available until</b> {a.available || "May 6 at 12:00am"} | 
+                      <span className="text-danger">Multiple Modules</span> |
+                      <b> Not available until</b> {a.availableFrom || "May 6 at 12:00am"} |
                       <br />
-                      <b>Due</b> {a.due} | {a.pts} pts
+                      <b>Due</b> {a.dueDate} | {a.points} pts
                     </div>
                   </div>
-
                   <div className="d-flex align-items-center">
                     <FaCheckCircle className="text-success me-3 fs-5" />
                     {isFaculty && (
-                      <button 
-                        onClick={() => window.confirm("Delete?") && dispatch(deleteAssignment(a._id))} 
-                        className="btn text-danger p-0 me-3"
-                      >
+                      <button onClick={() => handleDelete(a._id)}
+                        className="btn text-danger p-0 me-3">
                         Delete
                       </button>
                     )}

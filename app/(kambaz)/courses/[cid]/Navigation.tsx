@@ -16,7 +16,7 @@ export default function CourseNavigation() {
       <Breadcrumb course={course} />
       <hr />
       {links.map((link) => {
-        const suffix = link === "People" ? "people/table" : link.toLowerCase();
+        const suffix = link === "People" ? "people" : link.toLowerCase();
         const href = `/courses/${cid}/${suffix}`;
         const isActive = pathname.toLowerCase().includes(link.toLowerCase());
 
